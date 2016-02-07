@@ -1,0 +1,10 @@
+app
+cpu_app
+app_debug
+cpu_app_debug
+./a.out
+*.o
+.nfs*
+Test/putResults
+Test/callResults
+*.log

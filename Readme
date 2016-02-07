@@ -1,0 +1,24 @@
+Option Pricing with Binomial Lattice Model
+
+Requirements:
+Nvidia Graphics Card with nvcc
+
+To get started with this code, compile with the follwing command:
+
+make
+
+Once the code is compiled, see usage by running:
+
+./app 
+
+## Makefile options for GPU pricer
+make all - compile all code for both gpu and cpu implementation
+make cpu - compile only cpu implementation
+make test - run test on the gpu application
+make cpu_test - run test on the cpu application
+make timeExec - recompile with time debug flag on (reports cpu cycle
+stats as well as option prices computed)
+make option_test - runs comprehensive test for many different types
+of options (these options can be found in tests.xlsx)
+make speed_test - runs speed tests on all methods with varying timesteps
+make clean - cleans directory and removes all binary files
