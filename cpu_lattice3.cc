@@ -35,18 +35,11 @@ void smooth_payoff(double * w, const int n){
 }
 
 double computeBackwards(double * payoffs, int n, double discount, double p, double strike, double price, double up, int type){
-    bool fl;
     for (int i = n; i > 0; i--){
-        fl = true;
         for (int j = 0; j < i; j++){
-            payoffs[j] = (payoffs[j] * (1-p) + payoffs[j+1] * p);
-            if ((type == AMERICAN) && (fl = true)) {
-                double payoff = strike - price * pow(up, 2 * j - i + 1);
-                if (payoff > payoffs[j]) {
-                    payoffs[j] = payoff;
-                } else {
-                    fl = false;
-                }
+            payoffs[j] = discount * (payoffs[j] * (1-p) + payoffs[j+1] * p);
+            if (type == AMERICAN) {
+                payoffs[j] = max(payoffs[j], max(strike - price * pow(up, 2 * j - i + 1), 0.0));
             }
 #ifdef DEBUG
             cout << setprecision(20) << payoffs[j] << " ";
@@ -56,11 +49,11 @@ double computeBackwards(double * payoffs, int n, double discount, double p, doub
         cout << endl;
 #endif
     }
-    return payoffs[0] * pow(discount, n);
+    return payoffs[0];
 }
 
 int main(int argc, char* argv[]){
-    if (argc < 8)
+    if (argc < 10)
         return 1;
     //parameters passed from command line
     double price = atof(argv[1]), strike = atof(argv[2]), time = atof(argv[3]), 

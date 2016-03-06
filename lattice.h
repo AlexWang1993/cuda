@@ -7,7 +7,7 @@
 #define LATTICE
 
 #define BLOCK_LIMIT 65535
-#define THREAD_LIMIT 1
+#define THREAD_LIMIT 1024
 #define TRIANGLE_CEILING 250000
 
 #define EUROPEAN 0

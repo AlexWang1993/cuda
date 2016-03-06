@@ -68,6 +68,7 @@ computeOptionValue(
     int dsize = sizeof(double), 
         size = len * dsize;
 
+  //  printf("%d", size);
     double* answer = (double *)malloc(dsize);
 
 
@@ -106,13 +107,16 @@ computeOptionValue(
         cudaFree(w1);
         cudaFree(w2);
     } else {
+	//printf("pre-debug2");
         cudaMalloc((void **) &w, THREAD_LIMIT * size);
         checkCudaError("cudaMalloc failed for w.");
 
+	//printf("still-alive");
         get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w, price, up, down, opttype, strike, len, step_limit);
         checkCudaError("Failed to compute payoffs.");
 
 #ifdef DEBUG2
+	//printf("debug2");
         local = (double *)malloc(size);
         cudaMemcpy(local, w, size, cudaMemcpyDeviceToHost);
         fprintf(stderr, "Array after it: %d\n", 0);
@@ -172,7 +176,6 @@ int main(int argc, char* argv[])
         digits = atoi(argv[8]),
         nsteps = atoi(argv[9]),
         latticeType = atoi(argv[10]);
-
 #ifdef FIND_TIME 
     clock_t start = clock();
 #endif
