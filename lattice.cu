@@ -87,6 +87,67 @@ backward_recursion(double* w1,
     }
 }
 
+
+__global__ void 
+backward_recursion_lower_triangle_multiple(double* w, 
+                                           int n, 
+                                           int chunk, 
+                                           int len, 
+                                           double coef, 
+                                           double p, 
+                                           double strike, 
+                                           double up, 
+                                           double down, 
+                                           double price, 
+                                           int type)
+{
+    int tid = threadIdx.x;
+    int index = get_global_index(threadIdx, blockIdx, blockDim);
+    int upper = min(chunk, n);
+
+    for (int i = 1; i < upper; i++) {
+        for (int j = 0; j < min(upper - i, n - i - index * upper); j++) {
+            int ind = (i - 1) * len + index * upper + j;
+            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, ind, n, type);
+            w[ind + len] = res;
+        }
+    }   
+    __syncthreads();
+}
+
+__global__ void 
+backward_recursion_upper_triangle_multiple(double* w, 
+                                           int n, 
+                                           int chunk, 
+                                           int len, 
+                                           double coef, 
+                                           double p, 
+                                           double strike, 
+                                           double up, 
+                                           double down, 
+                                           double price, 
+                                           int type)
+{
+    int tid = threadIdx.x;
+    int index = get_global_index(threadIdx, blockIdx, blockDim);
+    int upper = min(chunk, n); 
+
+    for (int i = 1; i <= upper; i++) {
+        int upper_triangle_row_len = upper - i;
+        for (int j = 0; j < min(i, n - i - index * upper - upper_triangle_row_len); j++) {
+            int ind = (i - 1) * len + index * upper + upper_triangle_row_len + j;
+
+            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, ind, n, type);
+            if (i == upper) {
+                w[index * upper + j] = res;
+            } else {
+                w[ind + len] = res;
+            }   
+        }   
+        __syncthreads();
+    }   
+}
+
 __global__ void 
 backward_recursion_lower_triangle(double* w, 
                                   int n, 
