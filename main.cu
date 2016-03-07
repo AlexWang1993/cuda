@@ -153,7 +153,7 @@ computeOptionValue(
         // }
         int last_ans_index;
         for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= TRIANGLE_SIZE_PER_THREAD) {
-            last_ans_index = min(TRIANGLE_SIZE_PER_THREAD, i) * ( min(TRIANGLE_SIZE_PER_THREAD, i) - 1);
+            last_ans_index = len * ( min(TRIANGLE_SIZE_PER_THREAD, i) - 1);
             int thread_num = 32;
             int block_num = min(BLOCK_LIMIT, (i / thread_num / TRIANGLE_SIZE_PER_THREAD) + 1);
             backward_recursion_lower_triangle<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
@@ -161,9 +161,8 @@ computeOptionValue(
             backward_recursion_upper_triangle<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute lower triangles.");
         }
-        cudaMemcpy(answer, w, dsize * (last_ans_index+1), cudaMemcpyDeviceToHost);
+        cudaMemcpy(answer, w + last_ans_index, dsize, cudaMemcpyDeviceToHost);
         cudaFree(w);
-        answer[0] = answer[last_ans_index];
     }
 
     return answer[0];
