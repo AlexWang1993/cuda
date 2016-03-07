@@ -152,10 +152,10 @@ computeOptionValue(
         //     checkCudaError("Failed to compute lower triangles.");
         // }
         int last_ans_index;
-        for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= TRIANGLE_SIZE_PER_THREAD) {
+        for (int i = min(nsteps, TRIANGLE_CEILING) - 1; i > 0; i -= TRIANGLE_SIZE_PER_THREAD) {
             last_ans_index = len * ( min(TRIANGLE_SIZE_PER_THREAD, i) - 1);
             int thread_num = 32;
-            int block_num = min(BLOCK_LIMIT, (i / thread_num / TRIANGLE_SIZE_PER_THREAD) + 2);
+            int block_num = min(BLOCK_LIMIT, (i / thread_num / TRIANGLE_SIZE_PER_THREAD) + 1);
             backward_recursion_lower_triangle<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute upper triangles.");
             backward_recursion_upper_triangle<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
