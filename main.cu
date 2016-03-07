@@ -161,8 +161,9 @@ computeOptionValue(
             backward_recursion_upper_triangle<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute lower triangles.");
         }
-        cudaMemcpy(answer, w + last_ans_index, dsize, cudaMemcpyDeviceToHost);
+        cudaMemcpy(answer, w, dsize * (last_ans_index+1), cudaMemcpyDeviceToHost);
         cudaFree(w);
+        answer[0] = answer[last_ans_index];
     }
 
     return answer[0];
