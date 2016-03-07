@@ -144,11 +144,18 @@ computeOptionValue(
         fprintf(stderr, "Done Printing post smoothed");
 #endif
 
-        for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
-            int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 1);
-            backward_recursion_lower_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+        // for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
+        //     int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 1);
+        //     backward_recursion_lower_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+        //     checkCudaError("Failed to compute upper triangles.");
+        //     backward_recursion_upper_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+        //     checkCudaError("Failed to compute lower triangles.");
+        // }
+        for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= TRIANGLE_SIZE_PER_THREAD) {
+            int block_num = min(BLOCK_LIMIT, (i / TRIANGLE_SIZE_PER_THREAD) + 1);
+            backward_recursion_lower_triangle<<<block_num, 1>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute upper triangles.");
-            backward_recursion_upper_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+            backward_recursion_upper_triangle<<<block_num, 1>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute lower triangles.");
         }
         cudaMemcpy(answer, w, dsize, cudaMemcpyDeviceToHost);

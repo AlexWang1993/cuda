@@ -101,7 +101,7 @@ backward_recursion_lower_triangle_multiple(double* w,
                                            double price, 
                                            int type)
 {
-    int tid = threadIdx.x;
+
     int index = get_global_index(threadIdx, blockIdx, blockDim);
     int upper = min(chunk, n);
 
@@ -128,7 +128,7 @@ backward_recursion_upper_triangle_multiple(double* w,
                                            double price, 
                                            int type)
 {
-    int tid = threadIdx.x;
+
     int index = get_global_index(threadIdx, blockIdx, blockDim);
     int upper = min(chunk, n); 
 
