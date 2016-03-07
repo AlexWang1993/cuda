@@ -163,7 +163,7 @@ computeOptionValue(
         }
         cudaMemcpy(answer, w, dsize, cudaMemcpyDeviceToHost);
         cudaFree(w);
-        answer[0] = ans[last_ans_index];
+        answer[0] = answer[last_ans_index];
     }
 
     return answer[0];
