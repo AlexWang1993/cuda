@@ -144,8 +144,8 @@ backward_recursion_upper_triangle_multiple(double* w,
                 w[ind + len] = res;
             }   
         }   
-        __syncthreads();
     }   
+    __syncthreads();
 }
 
 __global__ void 
