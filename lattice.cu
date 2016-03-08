@@ -21,8 +21,8 @@ double compute(double coef,
                int n,
                int type)
 {
-    // double euro = coef * (p * w2 + (1 - p) * w1);
-    double euro = (p * w2 + (1 - p) * w1);
+    double euro = coef * (p * w2 + (1 - p) * w1);
+    // double euro = (p * w2 + (1 - p) * w1);
     if (type == EUROPEAN) {
         return euro;
     }
