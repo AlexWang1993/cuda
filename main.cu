@@ -108,7 +108,7 @@ computeOptionValue(
         cudaFree(w2);
     } else {
 	//printf("pre-debug2");
-        cudaMalloc((void **) &w, THREAD_LIMIT * size);
+        cudaMalloc((void **) &w, TRIANGLE_SIZE_PER_THREAD * size);
         checkCudaError("cudaMalloc failed for w.");
 
 	//printf("still-alive");
