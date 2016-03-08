@@ -15,21 +15,21 @@ while [ $steps -lt 120000 ]; do
 done
 exit
 '
-while [ $steps -lt 120000 ]; do
+while [ $steps -lt 1200000 ]; do
     echo "Running, steps = $steps"
     ../app_debug $price $strike $time $rate $vol 1 0 $digits $steps 0 #>> putBinomialTimeResult_2.log 
-    if [ $steps -lt 205000 ]; then
+    if [ $steps -lt 90000 ]; then
         ../cpu_app_debug $price $strike $time $rate $vol 1 0 $steps 0 #>> putCpuBinomial_2.log 
     fi
     wait
     steps=$((steps*10))
 done
-steps=500
-while [ $steps -lt 50000 ]; do
+steps=10
+while [ $steps -lt 2000000 ]; do
     echo "Running, steps = $steps"
-    ../app_debug $price $strike $time $rate $vol 0 0 $digits $steps 0 >> callBinomialTimeResult_2.log 
-    if [ $steps -lt 205000 ]; then
-        ../cpu_app_debug $price $strike $time $rate $vol 0 0 $steps 0 >> callCpuBinomial_2.log 
+    ../app_debug $price $strike $time $rate $vol 0 0 $digits $steps 0 #>> callBinomialTimeResult_2.log 
+    if [ $steps -lt 90000 ]; then
+        ../cpu_app_debug $price $strike $time $rate $vol 0 0 $steps 0 #>> callCpuBinomial_2.log 
     fi
     wait
     steps=$((steps*2))
