@@ -32,6 +32,6 @@ while [ $steps -lt 200000 ]; do
         ../cpu_app_debug $price $strike $time $rate $vol 0 0 $steps 0 #>> callCpuBinomial_2.log 
     fi
     wait
-    steps=$((steps*2))
+    steps=$((steps*10))
 done
 echo "DONE"
