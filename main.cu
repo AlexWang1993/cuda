@@ -66,7 +66,7 @@ computeOptionValue(
     double *w, *w1, *w2;
     int step_limit = THREAD_LIMIT * BLOCK_LIMIT;
     int len = nsteps + 1;
-    int dsize = sizeof(double), 
+    size_t dsize = sizeof(double), 
         size = len * dsize;
 
   //  printf("%d", size);
