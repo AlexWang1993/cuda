@@ -21,7 +21,8 @@ static void usage(){
 
 static void 
 checkCudaError(const char* err){
-    if (cudaSuccess != cudaGetLastError()) {
+    cudaError_t error = cudaGetLastError();
+    if (cudaSuccess != error) {
         fprintf(stderr, "ERROR: %s\n", cudaGetErrorString(error));
         exit(2);
     }
