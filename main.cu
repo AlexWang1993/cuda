@@ -192,6 +192,9 @@ int main(int argc, char* argv[])
 #ifdef FIND_TIME 
     clock_t start = clock();
 #endif
+    cudaSetDevice(0);
+    cudaDeviceSynchronize();
+    cudaThreadSynchronize();
     double prev_ans = computeOptionValue(price, strike, time, rate, sigma,
                                     opttype, type, nsteps, latticeType);
     if (digits == 0 && nsteps > 0){
