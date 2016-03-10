@@ -15,7 +15,7 @@ while [ $steps -lt 120000 ]; do
 done
 exit
 '
-while [ $steps -lt 1200000 ]; do
+while [ $steps -lt 200000 ]; do
     echo "Running, steps = $steps"
     ../app_debug $price $strike $time $rate $vol 1 0 $digits $steps 0 #>> putBinomialTimeResult_2.log 
     if [ $steps -lt 90000 ]; then
@@ -25,7 +25,7 @@ while [ $steps -lt 1200000 ]; do
     steps=$((steps*10))
 done
 steps=10
-while [ $steps -lt 2000000 ]; do
+while [ $steps -lt 200000 ]; do
     echo "Running, steps = $steps"
     ../app_debug $price $strike $time $rate $vol 0 1 $digits $steps 0 #>> callBinomialTimeResult_2.log 
     if [ $steps -lt 90000 ]; then
