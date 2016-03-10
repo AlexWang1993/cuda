@@ -23,14 +23,14 @@ double compute(double coef,
 {
     double euro = coef * (p * w2 + (1 - p) * w1);
     // double euro = (p * w2 + (1 - p) * w1);
-    if (type == AMERICAN) {
+    if (type == EUROPEAN) {
+        return euro;
+    }
+    else if (type == AMERICAN) {
         // this is wrong becuase we need to take into account down for the drifting lattice
         // this is also wrong becuase calls
         return max(euro, max(strike - price * pow(up, 2 * ind - n - 1), 0.0));
-    } else if (type == EUROPEAN) {
-        return euro;
     }
-
     return 0.0;
 }
 
