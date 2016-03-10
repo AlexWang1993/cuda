@@ -36,7 +36,7 @@ void smooth_payoff(double * w, const int n){
 
 double computeBackwards(double * payoffs, int n, double discount, double p, double strike, double price, double up, int type){
     bool fl;
-    for (int i = n - 1; i > 0; i--){
+    for (int i = n ; i > 0; i--){
         fl = true;
         for (int j = 0; j < i; j++){
             payoffs[j] = (payoffs[j] * (1-p) + payoffs[j+1] * p);
