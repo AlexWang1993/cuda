@@ -206,10 +206,10 @@ backward_recursion_upper_triangle_less_memory(double* w,
             int i_right = i_left + 1;
             int ind = (k - 1) * len + index;
             if (tid == upper - k) {
-              i_left = w[3 * len + index - tid + k];
+              i_left = w[3 * len + index - tid + k - 1];
             }
             if (tid == upper - 1) {
-              i_right = w[2 * len + index - tid + THREAD_LIMIT + k];
+              i_right = w[2 * len + index - tid + THREAD_LIMIT + k - 1];
             }
             double res = compute(coef, p, w[i_left], w[i_right], strike, up, down, price, ind, n, type);
             if (k == upper) {
