@@ -110,7 +110,7 @@ computeOptionValue(
     } else {
 	//printf("pre-debug2");
         fprintf(stderr, "space needed: %d\n", (THREAD_LIMIT + 1) * size);
-        cudaMalloc((void **) &w, (5) * size);
+        cudaMalloc((void **) &w, (THREAD_LIMIT + 1) * size);
         checkCudaError("cudaMalloc failed for w.");
 
 	//printf("still-alive");
