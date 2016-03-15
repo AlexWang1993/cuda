@@ -23,7 +23,7 @@ static void
 checkCudaError(const char* err){
     cudaError_t error = cudaGetLastError();
     if (cudaSuccess != error) {
-        fprintf(stderr, "ERROR: %s\n", cudaGetErrorString(error));
+        fprintf(stderr, "ERROR: %s, %s\n", err, cudaGetErrorString(error));
         exit(2);
     }
 }
