@@ -213,7 +213,7 @@ backward_recursion_upper_triangle_less_memory(double* w,
             }
             double res = compute(coef, p, w[i_left], w[i_right], strike, up, down, price, ind, n, type);
             if (k == upper) {
-                w[n % 2 * len + index] = res;
+                w[(n - k) % 2 * len + index] = res;
             } else {
                 w[(n - k ) % 2 * len + index] = res;
             }   
