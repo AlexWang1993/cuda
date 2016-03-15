@@ -174,6 +174,7 @@ backward_recursion_lower_triangle_less_memory(double* w,
             w[(n -k) % 2 * len + index] = res;
             if (tid == 0) {
                 w[2 * len + index + k] = res;
+            }
             if (tid == upper - k -1) {
                 w[3 * len + index - tid + k] = res; 
             }
