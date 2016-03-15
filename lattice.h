@@ -34,6 +34,14 @@ __global__ void backward_recursion_upper_triangle(double* w,
         int n, int base, int len, double discount, double p,
         double strike, double up, double down, double price, int type);
 
+__global__ void backward_recursion_lower_triangle_less_memory(double* w,
+        int n, int base, int len, double discount, double p,
+        double strike, double up, double down, double price, int type);
+
+__global__ void backward_recursion_upper_triangle_less_memory(double* w,
+        int n, int base, int len, double discount, double p,
+        double strike, double up, double down, double price, int type);
+
 __global__ void backward_recursion_lower_triangle_multiple(double* w,
         int n, int chunk, int len, double discount, double p,
         double strike, double up, double down, double price, int type);
