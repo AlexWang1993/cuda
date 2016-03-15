@@ -166,7 +166,7 @@ backward_recursion_lower_triangle_less_memory(double* w,
     int index = get_global_index(threadIdx, blockIdx, blockDim);
     int upper = min(THREAD_LIMIT, n); 
     w[2 * len + index - tid] = w[n % 2 * len + index - tid];
-    w[3 * len + index - tid] = w[n % 2 * len + ]
+    w[3 * len + index - tid] = w[n % 2 * len + THREAD_LIMIT + index - tid - 1];
     for (int k = 1; k < upper; k++) {
         if (tid < upper - k && index < n) {
             int i = (n - k + 1) % 2 * len + index;
