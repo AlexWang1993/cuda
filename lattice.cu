@@ -150,6 +150,77 @@ backward_recursion_upper_triangle_multiple(double* w,
 }
 
 __global__ void 
+backward_recursion_lower_triangle_less_memory(double* w, 
+                                              int n, 
+                                              int base, 
+                                              int len, 
+                                              double coef, 
+                                              double p, 
+                                              double strike, 
+                                              double up, 
+                                              double down, 
+                                              double price, 
+                                              int type)
+{
+    int tid = threadIdx.x;
+    int index = get_global_index(threadIdx, blockIdx, blockDim);
+    int upper = min(THREAD_LIMIT, n); 
+    w[2 * len + index - tid] = w[n % 2 * len + index - tid];
+    w[3 * len + index - tid] = w[n % 2 * len + ]
+    for (int k = 1; k < upper; k++) {
+        if (tid < upper - k && index < n) {
+            int i = (n - k + 1) % 2 * len + index;
+            double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, i, n, type);
+            w[(n -k) % 2 * len + index] = res;
+            if (tid == 0) {
+                w[2 * len + index + k] = res;
+            if (tid == upper - k -1) {
+                w[3 * len + index - tid + k] = res; 
+            }
+        }   
+        __syncthreads();
+    }   
+}
+
+__global__ void 
+backward_recursion_upper_triangle_less_memory(double* w, 
+                                              int n, 
+                                              int base, 
+                                              int len, 
+                                              double coef, 
+                                              double p, 
+                                              double strike, 
+                                              double up, 
+                                              double down, 
+                                              double price, 
+                                              int type)
+{
+    int tid = threadIdx.x;
+    int index = get_global_index(threadIdx, blockIdx, blockDim);
+    int upper = min(THREAD_LIMIT, n); 
+    for (int k = 1; k <= upper; k++) {
+        if (tid >= upper - k && index < n) {
+            int i_left = (n - k + 1) % 2 * len + index;
+            int i_right = i_left + 1;
+            if (tid == upper - k) {
+              i_left = w[3 * len + index - tid + k];
+            }
+            if (tid == upper - 1) {
+              i_right = w[2 * len + index - tid + THREAD_LIMIT + k];
+            }
+            double res = compute(coef, p, w[i_left], w[i_right], strike, up, down, price, i, n, type);
+            if (k == upper) {
+                w[n % 2 * len + index] = res;
+            } else {
+                w[(n - k ) % 2 * len + index] = res;
+            }   
+        }   
+        __syncthreads();
+    }   
+}
+
+
+__global__ void 
 backward_recursion_lower_triangle(double* w, 
                                   int n, 
                                   int base, 
@@ -160,7 +231,8 @@ backward_recursion_lower_triangle(double* w,
                                   double up, 
                                   double down, 
                                   double price, 
-                                  int type)
+                                  int type) 
+
 {
     int tid = threadIdx.x;
     int index = get_global_index(threadIdx, blockIdx, blockDim);

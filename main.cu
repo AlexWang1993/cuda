@@ -115,6 +115,9 @@ computeOptionValue(
 
 	//printf("still-alive");
         get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w, price, up, down, opttype, strike, len, step_limit);
+        if (n % 2 == 1) {
+            cudaMemcpy(w, w + n, size, cudaMemcpyDeviceToDevice);
+        }
         checkCudaError("Failed to compute payoffs.");
 
 #ifdef DEBUG2
