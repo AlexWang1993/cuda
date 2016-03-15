@@ -110,15 +110,16 @@ computeOptionValue(
     } else {
 	//printf("pre-debug2");
         fprintf(stderr, "space needed: %d\n", (THREAD_LIMIT + 1) * size);
-        cudaMalloc((void **) &w, (100) * size);
+        cudaMalloc((void **) &w, (100 ) * size);
         checkCudaError("cudaMalloc failed for w.");
 
 	//printf("still-alive");
         get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w, price, up, down, opttype, strike, len, step_limit);
+        checkCudaError("Failed to compute payoffs.");
         // if (len % 2 == 0) {
             cudaMemcpy(w, w + len, size, cudaMemcpyDeviceToDevice);
         // }
-        checkCudaError("Failed to compute payoffs.");
+        checkCudaError("Failed to copy payoffs.");
 
 #ifdef DEBUG2
 	//printf("debug2");
