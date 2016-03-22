@@ -239,7 +239,7 @@ backward_recursion_lower_triangle(double* w,
 {
     int tid = threadIdx.x;
     int index = get_global_index(threadIdx, blockIdx, blockDim);
-    int upper = min(THREAD_LIMIT, n); 
+    int upper = min(THREAD_LIMIT, n);  
     for (int k = 1; k < upper; k++) {
         if (tid < upper - k && index < n - k + 1) {
             int i = (k - 1) * len + index;
