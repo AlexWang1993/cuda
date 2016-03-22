@@ -202,7 +202,7 @@ backward_recursion_upper_triangle_less_memory(double* w,
     int upper = min(THREAD_LIMIT, n); 
     for (int k = 1; k <= upper; k++) {
         if (tid >= upper - k && index < n - k + 1) {
-            fprintf(stderr, "done");
+            printf("done");
             int i_left = (n - k + 1) % 2 * len + index;
             int i_right = i_left + 1;
             int ind = (k - 1) * len + index;
