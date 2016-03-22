@@ -120,7 +120,7 @@ computeOptionValue(
         // if (len % 2 == 0) {
             cudaMemcpy(w, w + len, size, cudaMemcpyDeviceToDevice);
             l = (double *)malloc(4 * size);
-            cudaMemcpy(l, w, size, cudaMemcpyDeviceToHost);
+            cudaMemcpy(l, w, 4 * size, cudaMemcpyDeviceToHost);
             printf("%f, %f, %f, %f\n", l[0],l[1],l[2],l[3]);
             printf("%f, %f, %f, %f\n", l[4],l[5],l[6],l[7]);
         // }
