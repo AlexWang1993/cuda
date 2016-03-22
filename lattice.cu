@@ -241,7 +241,7 @@ backward_recursion_lower_triangle(double* w,
     for (int k = 1; k < upper; k++) {
         if (tid < upper - k && index < n - k + 1) {
             int i = (k - 1) * len + index;
-            double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, i, n, type);
+            double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, index, n - k, type);
             w[i + len] = res;
         }   
         __syncthreads();
@@ -267,7 +267,7 @@ backward_recursion_upper_triangle(double* w,
     for (int k = 1; k <= upper; k++) {
         if (tid >= upper - k && index < n - k + 1) {
             int i = (k - 1) * len + index;
-            double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, i, n, type);
+            double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, index, n - k, type);
             if (k == upper) {
                 w[index] = res;
             } else {
