@@ -3,6 +3,7 @@
 #include <time.h>
 
 double * local;
+double * l;
 
 static void usage(){
     fprintf(stderr, "usage: ./app price strike timeToExp rate volatility optionType type digits steps latticeMethod\n");
@@ -118,7 +119,7 @@ computeOptionValue(
         checkCudaError("Failed to compute payoffs.");
         // if (len % 2 == 0) {
             cudaMemcpy(w, w + len, size, cudaMemcpyDeviceToDevice);
-            local = (double *)malloc(4 * size);
+            l = (double *)malloc(4 * size);
             cudaMemcpy(l, w, size, cudaMemcpyDeviceToHost);
             printf("%f, %f, %f, %f\n", l[0],l[1],l[2],l[3]);
             printf("%f, %f, %f, %f\n", l[4],l[5],l[6],l[7]);
