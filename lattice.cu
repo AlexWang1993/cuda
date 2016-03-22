@@ -109,7 +109,7 @@ backward_recursion_lower_triangle_multiple(double* w,
     for (int i = 0; i < upper; i++) {
         for (int j = 0; j < min(upper - i, n - i - index * upper); j++) {
             int ind = i * len + index * upper + j;
-            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, index * upper + j, n - i, type);
+            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, index * upper + j, n - i - 1, type);
             w[ind + len] = res;
         }
     }   
@@ -138,7 +138,7 @@ backward_recursion_upper_triangle_multiple(double* w,
         for (int j = 0; j < min(i, n - i - index * upper - upper_triangle_row_len); j++) {
             int ind = i * len + index * upper + upper_triangle_row_len + j;
 
-            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, index * upper + upper_triangle_row_len + j, n - i, type);
+            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, index * upper + upper_triangle_row_len + j, n - i - 1, type);
             if (i == upper) {
                 w[index * upper + j] = res;
             } else {
