@@ -109,7 +109,7 @@ backward_recursion_lower_triangle_multiple(double* w,
     for (int i = 0; i < upper; i++) {
         for (int j = 0; j < min(upper - i, n - i - index * upper); j++) {
             int ind = i * len + index * upper + j;
-            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, ind, n, type);
+            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, ind, n - i, type);
             w[ind + len] = res;
         }
     }   
@@ -138,7 +138,7 @@ backward_recursion_upper_triangle_multiple(double* w,
         for (int j = 0; j < min(i, n - i - index * upper - upper_triangle_row_len); j++) {
             int ind = i * len + index * upper + upper_triangle_row_len + j;
 
-            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, ind, n, type);
+            double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, ind, n - i, type);
             if (i == upper) {
                 w[index * upper + j] = res;
             } else {
@@ -170,7 +170,7 @@ backward_recursion_lower_triangle_less_memory(double* w,
     for (int k = 1; k < upper; k++) {
         if (tid < upper - k && index < n - k + 1) {
             int i = (n - k + 1) % 2 * len + index;
-            int ind = (k - 1) * len + index;
+
             double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, index, n - k, type);
             w[(n - k) % 2 * len + index] = res;
             if (tid == 0) {
@@ -205,7 +205,7 @@ backward_recursion_upper_triangle_less_memory(double* w,
 
             int i_left = (n - k + 1) % 2 * len + index;
             int i_right = i_left + 1;
-            int ind = (k - 1) * len + index;
+
             if (tid == upper - k) {
               i_left = 3 * len + index - tid + k - 1;
             }
