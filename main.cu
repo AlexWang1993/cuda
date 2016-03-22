@@ -111,7 +111,7 @@ computeOptionValue(
     } else {
 	//printf("pre-debug2");
         fprintf(stderr, "space needed: %d\n", (THREAD_LIMIT + 1) * size);
-        cudaMalloc((void **) &w, 4 * size);
+        cudaMalloc((void **) &w, (THREAD_LIMIT + 1) * size);
         checkCudaError("cudaMalloc failed for w.");
 
 	//printf("still-alive");
@@ -156,9 +156,9 @@ computeOptionValue(
 
         for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
             int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 1);
-            backward_recursion_lower_triangle_less_memory<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+            backward_recursion_lower_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute upper triangles.");
-            backward_recursion_upper_triangle_less_memory<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+            backward_recursion_upper_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute lower triangles.");
         }
         // int last_ans_index;
