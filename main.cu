@@ -118,8 +118,10 @@ computeOptionValue(
         checkCudaError("Failed to compute payoffs.");
         // if (len % 2 == 0) {
             cudaMemcpy(w, w + len, size, cudaMemcpyDeviceToDevice);
-            printf("%f, %f, %f, %f\n", w[1],w[2],w[3],w[4]);
-            printf("%f, %f, %f, %f\n", w[5],w[6],w[7],w[8]);
+            local = (double *)malloc(4 * size);
+            cudaMemcpy(l, w, size, cudaMemcpyDeviceToHost);
+            printf("%f, %f, %f, %f\n", l[0],l[1],l[2],l[3]);
+            printf("%f, %f, %f, %f\n", l[4],l[5],l[6],l[7]);
         // }
         checkCudaError("Failed to copy payoffs.");
 
