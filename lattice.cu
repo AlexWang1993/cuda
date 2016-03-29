@@ -172,7 +172,7 @@ backward_recursion_lower_triangle_less_memory(double* w,
       w[2 * len + index - tid] = w[n % 2 * len + index - tid];
       w[3 * len + index - tid] = w[n % 2 * len + upper + index - tid - 1];
 
-      printf("%d to %d, %f", 2 * len + index - tid, n % 2 * len + index - tid, w[n % 2 * len + index - tid]);
+      printf("%d to %d, %f\n", 2 * len + index - tid, n % 2 * len + index - tid, w[n % 2 * len + index - tid]);
     }
     for (int k = 1; k < upper; k++) {
         if (tid < upper - k && index < n - k + 1) {
