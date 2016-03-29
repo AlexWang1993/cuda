@@ -173,6 +173,7 @@ backward_recursion_lower_triangle_less_memory(double* w,
 
             double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, index, n - k, type);
             w[(n - k) % 2 * len + index] = res;
+            printf("level: %d, left: %d, %f, right: %d, %f, self: %d\n", k, i, w[i], i+1, w[i+1], (n - k) % 2 * len + index);
             if (tid == 0) {
                 w[2 * len + index + k] = res;
             }
