@@ -168,11 +168,11 @@ backward_recursion_lower_triangle_less_memory(double* w,
     // int index = get_global_index(threadIdx, blockIdx, blockDim);
     int index = blockIdx.x * upper + tid;
 
-    if ((blockIdx.x <= 1) && (tid < upper)) {
+    if (tid == 0) {
       w[2 * len + index - tid] = w[n % 2 * len + index - tid];
       w[3 * len + index - tid] = w[n % 2 * len + upper + index - tid - 1];
 
-      printf("%d to %d, %f\n", 2 * len + index - tid, n % 2 * len + index - tid, w[n % 2 * len + index - tid]);
+      // printf("%d to %d, %f\n", 2 * len + index - tid, n % 2 * len + index - tid, w[n % 2 * len + index - tid]);
     }
     for (int k = 1; k < upper; k++) {
         if (tid < upper - k && index < n - k + 1) {
@@ -180,7 +180,7 @@ backward_recursion_lower_triangle_less_memory(double* w,
 
             double res = compute(coef, p, w[i], w[i+1], strike, up, down, price, index, n - k, type);
             w[(n - k) % 2 * len + index] = res;
-            printf("level: %d, left: %d, %f, right: %d, %f, self: %d, %f\n", k, i, w[i], i+1, w[i+1], (n - k) % 2 * len + index, res);
+            // printf("level: %d, left: %d, %f, right: %d, %f, self: %d, %f\n", k, i, w[i], i+1, w[i+1], (n - k) % 2 * len + index, res);
             if (tid == 0) {
                 w[2 * len + index + k] = res;
             }
