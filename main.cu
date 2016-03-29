@@ -155,7 +155,7 @@ computeOptionValue(
 #endif
 
         for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
-            int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 1);
+            int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 2);
             backward_recursion_lower_triangle_less_memory<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
             checkCudaError("Failed to compute upper triangles.");
             backward_recursion_upper_triangle_less_memory<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
