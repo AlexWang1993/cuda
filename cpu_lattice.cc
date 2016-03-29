@@ -14,7 +14,7 @@ using namespace std;
 
 double * getPayoff(double up, double down, double price, double strike, int n, int type){
     double * payoffs = new double[n];
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i <= n; i++){
         double payoff = price * pow(down, n - i - 1) * pow(up, i); 
         if (type == CALL)
             payoffs[i] = payoff > strike ? payoff - strike : 0.0;
@@ -45,7 +45,7 @@ double computeBackwards(double * payoffs, int n, double discount, double p, doub
                 if (payoff > payoffs[j]) {
                     payoffs[j] = payoff;
                 } else {
-                    fl = false;
+                    // fl = false;
                 }
             }
 #ifdef DEBUG
