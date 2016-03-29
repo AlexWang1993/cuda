@@ -39,13 +39,13 @@ double computeBackwards(double * payoffs, int n, double discount, double p, doub
     for (int i = n ; i > 0; i--){
         fl = true;
         for (int j = 0; j < i; j++){
-            payoffs[j] = (payoffs[j] * (1-p) + payoffs[j+1] * p);
-            if ((type == AMERICAN) && (fl = true)) {
+            payoffs[j] = (payoffs[j] * (1-p) + payoffs[j+1] * p) * discount;
+            if ((type == AMERICAN) && (fl == true)) {
                 double payoff = strike - price * pow(up, 2 * j - i + 1);
                 if (payoff > payoffs[j]) {
                     payoffs[j] = payoff;
                 } else {
-                    // fl = false;
+                    fl = false;
                 }
             }
 #ifdef DEBUG
@@ -56,7 +56,7 @@ double computeBackwards(double * payoffs, int n, double discount, double p, doub
         cout << endl;
 #endif
     }
-    return payoffs[0] * pow(discount, n);
+    return payoffs[0];
 }
 
 int main(int argc, char* argv[]){
