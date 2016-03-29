@@ -29,7 +29,7 @@ double compute(double coef,
     else if (type == AMERICAN) {
         // this is wrong becuase we need to take into account down for the drifting lattice
         // this is also wrong becuase calls
-        return max(euro, max(strike - price * pow(up, 2 * ind - n), 0.0));
+        return max(euro, max(strike - price * pow(down, n - ind) * pow(up, ind), 0.0));
     }
     return 0.0;
 }
