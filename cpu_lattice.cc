@@ -41,7 +41,7 @@ double computeBackwards(double * payoffs, int n, double discount, double p, doub
         for (int j = 0; j < i; j++){
             payoffs[j] = (payoffs[j] * (1-p) + payoffs[j+1] * p);
             if ((type == AMERICAN) && (fl = true)) {
-                double payoff = strike - price * pow(up, 2 * j - i);
+                double payoff = strike - price * pow(up, 2 * j - i -1);
                 if (payoff > payoffs[j]) {
                     payoffs[j] = payoff;
                 } else {
