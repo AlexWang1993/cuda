@@ -143,7 +143,7 @@ computeOptionValue(
 
 // #ifdef DEBUG2
         local = (double *)malloc(size);
-        cudaMemcpy(local, w, size, cudaMemcpyDeviceToHost);
+        cudaMemcpy(local, w + len, size, cudaMemcpyDeviceToHost);
         fprintf(stderr, "Array after it: %d\n", 0);
 
         for (int j = 0; j < len; j++){
