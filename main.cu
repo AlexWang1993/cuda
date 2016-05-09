@@ -115,13 +115,13 @@ computeOptionValue(
         checkCudaError("cudaMalloc failed for w.");
 
 	//printf("still-alive");
-        get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w, price, up, down, opttype, strike, len, step_limit);
+        get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w + len, price, up, down, opttype, strike, len, step_limit);
         checkCudaError("Failed to compute payoffs.");
         // if (len % 2 == 0) {
             // cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
-            local = (double *)malloc(size);
-            cudaMemcpy(local, w , size, cudaMemcpyDeviceToHost);
-            cudaMemcpy(w + len, local, size, cudaMemcpyHostToDevice);
+            // local = (double *)malloc(size);
+            // cudaMemcpy(local, w , size, cudaMemcpyDeviceToHost);
+            // cudaMemcpy(w + len, local, size, cudaMemcpyHostToDevice);
 
         // }
         checkCudaError("Failed to copy payoffs.");
