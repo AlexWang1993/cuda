@@ -17,7 +17,7 @@ cpu3: cpu_lattice2.cc
 	nvcc $(CXXFLAGS) -c $< 
 
 test: all cpu_test
-	./app 10 10 0.1 0.02 0.2 0 0 5 250000 0
+	./app 10 10 0.1 0.02 0.2 0 0 5 25000 0
 
 cpu_test: cpu 
 	./cpu_app 10 10 0.1 0.02 0.2 0 0 25000
