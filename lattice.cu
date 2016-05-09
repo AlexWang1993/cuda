@@ -222,7 +222,7 @@ backward_recursion_upper_triangle_less_memory(double* w,
             }
             if (tid == upper - 1) {
               i_right = 2 * len + index - tid + upper + k - 1;
-              printf("right: %d \n", i_right);
+              printf("right: %d \n", w[i_right]);
             }
             // printf("level: %d, left: %d, %f, right: %d, %f, self: %d\n", k, i_left, w[i_left], i_right, w[i_right], (n - k) % 2 * len + index);
             double res = compute(coef, p, w[i_left], w[i_right], strike, up, down, price, index, n - k, type);
