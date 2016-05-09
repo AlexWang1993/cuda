@@ -115,7 +115,7 @@ computeOptionValue(
         checkCudaError("cudaMalloc failed for w.");
 
 	//printf("still-alive");
-        get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w + len, price, up, down, opttype, strike, len, step_limit);
+        get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w, price, up, down, opttype, strike, len, step_limit);
         checkCudaError("Failed to compute payoffs.");
         // if (len % 2 == 0) {
             // cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
@@ -140,6 +140,7 @@ computeOptionValue(
         fprintf(stderr, "DOne Printing pre smoothed");
 #endif
         smooth_payoff<<<1,1>>>(w, len);
+        cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
         checkCudaError("Failed to smooth payoffs.");
 
 // #ifdef DEBUG2
