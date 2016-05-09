@@ -218,7 +218,7 @@ backward_recursion_upper_triangle_less_memory(double* w,
 
             if (tid == upper - k) {
               i_left = 3 * len + index - tid + k - 1;
-              printf("left: %d", i_left);
+              printf("left: %d", w[i_left]);
             }
             if (tid == upper - 1) {
               i_right = 2 * len + index - tid + upper + k - 1;
