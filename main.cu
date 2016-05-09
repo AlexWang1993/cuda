@@ -118,7 +118,9 @@ computeOptionValue(
         get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w, price, up, down, opttype, strike, len, step_limit);
         checkCudaError("Failed to compute payoffs.");
         // if (len % 2 == 0) {
-            cudaMemcpy(w + 3, w, size, cudaMemcpyDeviceToDevice);
+            for (int i = 0; i < len; i++) {
+                w[i + len] = w[i];
+            }
             l = (double *)malloc(4 * size);
             cudaMemcpy(l, w, 4 * size, cudaMemcpyDeviceToHost);
 
