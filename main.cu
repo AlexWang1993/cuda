@@ -119,8 +119,9 @@ computeOptionValue(
         checkCudaError("Failed to compute payoffs.");
         // if (len % 2 == 0) {
             cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
-            l = (double *)malloc(4 * size);
-            cudaMemcpy(l, w, 4 * size, cudaMemcpyDeviceToHost);
+            local = (double *)malloc(size);
+            cudaMemcpy(local, w , size, cudaMemcpyDeviceToHost);
+            cudaMemcpy(w + len, local, size, cudaMemcpyHostToDevice);
 
         // }
         checkCudaError("Failed to copy payoffs.");
@@ -143,7 +144,7 @@ computeOptionValue(
 
 // #ifdef DEBUG2
         local = (double *)malloc(size);
-        cudaMemcpy(local, w , size, cudaMemcpyDeviceToHost);
+        cudaMemcpy(local, w +len, size, cudaMemcpyDeviceToHost);
         fprintf(stderr, "Array after it: %d\n", 0);
 
         for (int j = 0; j < len; j++){
