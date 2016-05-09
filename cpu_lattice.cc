@@ -36,10 +36,12 @@ void smooth_payoff(double * w, const int n){
 
 double computeBackwards(double * payoffs, int n, double discount, double p, double strike, double price, double up, int type){
     bool fl;
+    for (int j = 0 ; i <= n; j++) {
+        cout << setprecision(20) << payoffs[j] << " ";
+    }
     for (int i = n ; i > 0; i--){
         fl = true;
         for (int j = 0; j < i; j++){
-            cout << setprecision(20) << payoffs[j] << " ";
             payoffs[j] = (payoffs[j] * (1-p) + payoffs[j+1] * p) * discount;
             if ((type == AMERICAN) && (fl == true)) {
                 double payoff = strike - price * pow(up, 2 * j - i + 1);
@@ -50,7 +52,7 @@ double computeBackwards(double * payoffs, int n, double discount, double p, doub
                 }
             }
 // #ifdef DEBUG
-            
+            cout << setprecision(20) << payoffs[j] << " ";
 // #endif
         }
 // #ifdef DEBUG
