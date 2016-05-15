@@ -143,7 +143,7 @@ computeOptionValue(
         cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
         checkCudaError("Failed to smooth payoffs.");
 
-// #ifdef DEBUG2
+#ifdef DEBUG2
         local = (double *)malloc(size);
         cudaMemcpy(local, w +len, size, cudaMemcpyDeviceToHost);
         fprintf(stderr, "Array after it: %d\n", 0);
@@ -154,7 +154,7 @@ computeOptionValue(
 
         free(local);
         fprintf(stderr, "Done Printing post smoothed");
-// #endif
+#endif
 
         // for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
         //     int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 2);
