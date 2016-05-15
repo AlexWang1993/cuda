@@ -51,13 +51,13 @@ double computeBackwards(double * payoffs, int n, double discount, double p, doub
                     fl = false;
                 }
             }
-// #ifdef DEBUG
+#ifdef DEBUG
             cout << setprecision(20) << payoffs[j] << " ";
-// #endif
+#endif
         }
-// #ifdef DEBUG
+#ifdef DEBUG
         cout << endl;
-// #endif
+#endif
     }
     return payoffs[0];
 }
