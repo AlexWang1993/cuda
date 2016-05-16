@@ -107,7 +107,7 @@ backward_recursion_lower_triangle_multiple(double* w,
     int upper = min(chunk, n);
 
     for (int i = 0; i < upper; i++) {
-        for (int j = 0; j < min(upper - i, n - i - index * upper); j++) {
+        for (int j = 0; j < min(upper - i, n + 1 - i - index * upper); j++) {
             int ind = i * len + index * upper + j;
             double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, index * upper + j, n - i - 1, type);
             w[ind + len] = res;
