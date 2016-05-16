@@ -111,7 +111,7 @@ computeOptionValue(
     } else {
 	//printf("pre-debug2");
         fprintf(stderr, "space needed: %d\n", (THREAD_LIMIT + 1) * size);
-        cudaMalloc((void **) &w, 4 * size);
+        cudaMalloc((void **) &w, 100 * size);
         checkCudaError("cudaMalloc failed for w.");
 
 	//printf("still-alive");
@@ -140,7 +140,7 @@ computeOptionValue(
         fprintf(stderr, "DOne Printing pre smoothed");
 #endif
         smooth_payoff<<<1,1>>>(w, len);
-        cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
+        // cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
         checkCudaError("Failed to smooth payoffs.");
 
 #ifdef DEBUG2
