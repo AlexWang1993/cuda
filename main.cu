@@ -164,7 +164,7 @@ computeOptionValue(
         //     checkCudaError("Failed to compute lower triangles.");
         // }
         int last_ans_index;
-        for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= TRIANGLE_SIZE_PER_THREAD + 1) {
+        for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= (TRIANGLE_SIZE_PER_THREAD + 1)) {
             last_ans_index = len * (min(TRIANGLE_SIZE_PER_THREAD, i)) ;
             int thread_num = 32;
             int block_num = min(BLOCK_LIMIT, i / (thread_num * TRIANGLE_SIZE_PER_THREAD) + 1);

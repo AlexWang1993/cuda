@@ -133,7 +133,7 @@ backward_recursion_upper_triangle_multiple(double* w,
     int index = get_global_index(threadIdx, blockIdx, blockDim);
     int upper = min(chunk, n); 
 
-    for (int i = 0; i <= upper; i++) {
+    for (int i = 1; i <= upper; i++) {
         int upper_triangle_row_len = upper - i;
         for (int j = 0; j < min(i, n - i - index * upper - upper_triangle_row_len); j++) {
             int ind = i * len + index * upper + upper_triangle_row_len + j;
