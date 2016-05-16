@@ -135,7 +135,7 @@ backward_recursion_upper_triangle_multiple(double* w,
 
     for (int i = 1; i <= upper; i++) {
         int upper_triangle_row_len = upper - i;
-        for (int j = 0; j < min(i, n - i - index * upper - upper_triangle_row_len); j++) {
+        for (int j = 0; j < min(i, n + 1 - i - index * upper - upper_triangle_row_len); j++) {
             int ind = i * len + index * upper + upper_triangle_row_len + j;
 
             double res = compute(coef, p, w[ind], w[ind+1], strike, up, down, price, index * upper + upper_triangle_row_len + j, n - i - 1, type);
