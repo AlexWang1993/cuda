@@ -24,7 +24,7 @@ double * getPayoff(double up, double down, double price, double strike, int n, i
     return payoffs;
 }
 
-void smooth_payoff(double * w, const int n, double price, double strike, double down, double up, double delt, double sigma, int type){
+void smooth_payoff(double * w, const int n, double price, double strike, double up, double down, double delt, double sigma, int type){
     if (type == CALL) {
         for (int i = 0; i <= n; i++) {
             double cur_price = price * pow(down, n - i - 1) * pow(up, i); 
@@ -33,6 +33,8 @@ void smooth_payoff(double * w, const int n, double price, double strike, double 
             } else if ((down * cur_price < strike) && (strike < up * cur_price)) {
                 w[i] = 1.0 /(2.0 * sigma * sqrt(delt)) * (cur_price * (exp(sigma * sqrt(delt)) - strike / cur_price) 
                     - strike * (sigma * sqrt(delt) - log(strike / cur_price)));
+            } else {
+                w[i] = 0.0;
             }
         }
     } else if (type == PUT) {
@@ -43,6 +45,8 @@ void smooth_payoff(double * w, const int n, double price, double strike, double 
             } else if ((down * cur_price < strike) && (strike < up * cur_price)) {
                 w[i] = 1.0 /(2.0 * sigma * sqrt(delt)) * (strike * (log(strike / cur_price) + sigma * sqrt(delt)) 
                     - cur_price * (strike / cur_price - exp(-sigma * sqrt(delt))));
+            } else {
+                w[i] = 0.0;
             }
         }
     }
@@ -102,7 +106,7 @@ int main(int argc, char* argv[]){
     double prob = (1 + (rate / sigma - sigma / 2)*sqrt(delt))/2;
 
     double * payoffs = getPayoff(up, down, price, strike, nsteps + 1, opttype);
-    smooth_payoff(payoffs, nsteps + 1, price, strike, down, up, delt, sigma, opttype);
+    smooth_payoff(payoffs, nsteps + 1, price, strike, up, down, delt, sigma, opttype);
 
 #ifdef DEBUG
     cout << "p " << prob  << " up " << up << " down " << down << " discount " << c << endl;
