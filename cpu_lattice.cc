@@ -24,7 +24,7 @@ double * getPayoff(double up, double down, double price, double strike, int n, i
     return payoffs;
 }
 
-void smooth_payoff(double * w, const int n, double strike, double down, double up, double delt, double sigma){
+void smooth_payoff(double * w, const int n, double strike, double down, double up, double delt, double sigma, int type){
     if (type == CALL) {
         for (int i = 0; i <= n; i++) {
             if (exp(-sigma * sqrt(delt)) * w[i] > strike) {
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]){
     double prob = (1 + (rate / sigma - sigma / 2)*sqrt(delt))/2;
 
     double * payoffs = getPayoff(up, down, price, strike, nsteps + 1, opttype);
-    smooth_payoff(payoffs, nsteps + 1);
+    smooth_payoff(payoffs, nsteps + 1, strike, down, up, delt, sigma, opttype);
 
 #ifdef DEBUG
     cout << "p " << prob  << " up " << up << " down " << down << " discount " << c << endl;
