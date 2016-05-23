@@ -50,6 +50,7 @@ __global__ void backward_recursion_upper_triangle_multiple(double* w,
         int n, int chunk, int len, double discount, double p,
         double strike, double up, double down, double price, int type);
 
-__global__ void smooth_payoff(double *w, int n);
+__global__ void smooth_payoff(double *w, int n, double price, double strike,
+        double up, double down, double delt, double sigma, int type);
 
 #endif
