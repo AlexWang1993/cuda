@@ -24,9 +24,12 @@ while [ $steps -lt 200000 ]; do
     echo "One triangle per thread:"
     ../app_debug $price $strike $time $rate $vol 0 0 $digits $steps 0 0 2 
     if [ $steps -lt 90000 ]; then
+        echo "CPU implementation:"
         ../cpu_app_debug $price $strike $time $rate $vol 0 0 $steps 0 0 
     fi
     wait
+
+    echo ""
     steps=$((steps*10))
 done
 steps=10
@@ -38,9 +41,12 @@ while [ $steps -lt 200000 ]; do
     echo "One triangle per thread:"
     ../app_debug $price $strike $time $rate $vol 1 1 $digits $steps 0 0 2 
     if [ $steps -lt 90000 ]; then
+        echo "CPU implementation:"
         ../cpu_app_debug $price $strike $time $rate $vol 1 1 $steps 0 0 
     fi
     wait
+
+    echo ""
     steps=$((steps*10))
 done
 echo "DONE"
