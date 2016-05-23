@@ -58,7 +58,7 @@ get_payoff(double* w,
 }
 
 __global__ void
-void smooth_payoff(double * w, const int n, double price, double strike, double up, double down, double delt, double sigma, int type){
+smooth_payoff(double * w, const int n, double price, double strike, double up, double down, double delt, double sigma, int type){
     if (type == CALL) {
         for (int i = 0; i <= n; i++) {
             double cur_price = price * pow(down, n - i - 1) * pow(up, i); 
