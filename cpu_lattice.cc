@@ -34,7 +34,7 @@ void smooth_payoff(double * w, const int n, double strike, double down, double u
                     - strike * (sigma * sqrt(delt) - log(strike / w[i])));
             }
         }
-    } else (type == PUT) {
+    } else if (type == PUT) {
         for (int i = 0; i <= n; i++) {
             if (exp(sigma * sqrt(delt)) * w[i] < strike) {
                 w[i] = strike - w[i] * (exp(sigma * sqrt(delt)) - exp(-sigma * sqrt(delt))) / (2.0 * sigma * sqrt(delt));
