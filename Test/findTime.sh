@@ -17,9 +17,14 @@ exit
 '
 while [ $steps -lt 200000 ]; do
     echo "Running, steps = $steps"
-    ../app_debug $price $strike $time $rate $vol 1 0 $digits $steps 0 #>> putBinomialTimeResult_2.log 
+    echo "Old implementation:"
+    ../app_debug $price $strike $time $rate $vol 0 0 $digits $steps 0 0 0 
+    echo "Less memory:"
+    ../app_debug $price $strike $time $rate $vol 0 0 $digits $steps 0 0 1 
+    echo "One triangle per thread:"
+    ../app_debug $price $strike $time $rate $vol 0 0 $digits $steps 0 0 2 
     if [ $steps -lt 90000 ]; then
-        ../cpu_app_debug $price $strike $time $rate $vol 1 0 $steps 0 #>> putCpuBinomial_2.log 
+        ../cpu_app_debug $price $strike $time $rate $vol 0 0 $steps 0 0 
     fi
     wait
     steps=$((steps*10))
@@ -27,9 +32,13 @@ done
 steps=10
 while [ $steps -lt 200000 ]; do
     echo "Running, steps = $steps"
-    ../app_debug $price $strike $time $rate $vol 1 1 $digits $steps 0 #>> callBinomialTimeResult_2.log 
+    ../app_debug $price $strike $time $rate $vol 1 1 $digits $steps 0 0 0 
+    echo "Less memory:"
+    ../app_debug $price $strike $time $rate $vol 1 1 $digits $steps 0 0 1 
+    echo "One triangle per thread:"
+    ../app_debug $price $strike $time $rate $vol 1 1 $digits $steps 0 0 2 
     if [ $steps -lt 90000 ]; then
-        ../cpu_app_debug $price $strike $time $rate $vol 1 1 $steps 0 #>> callCpuBinomial_2.log 
+        ../cpu_app_debug $price $strike $time $rate $vol 1 1 $steps 0 0 
     fi
     wait
     steps=$((steps*10))
