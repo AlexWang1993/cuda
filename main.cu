@@ -208,7 +208,7 @@ int main(int argc, char* argv[])
         type = atoi(argv[7]),
         digits = atoi(argv[8]),
         nsteps = atoi(argv[9]),
-        latticeType = atoi(argv[10]);
+        latticeType = atoi(argv[10]),
         smooth = atoi(argv[11]);
 #ifdef FIND_TIME 
     clock_t start = clock();
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
         while (abs(ans - prev_ans) > pow(10, -digits)){
             prev_ans = ans;
             ans = computeOptionValue(price, strike, time, rate, sigma,
-                                        opttype, type, steps, latticeType);
+                                        opttype, type, steps, latticeType, smooth);
             steps *= 2;
         }
     } else {
