@@ -106,7 +106,7 @@ int main(int argc, char* argv[]){
     double prob = (1 + (rate / sigma - sigma / 2)*sqrt(delt))/2;
 
     double * payoffs = getPayoff(up, down, price, strike, nsteps + 1, opttype);
-    smooth_payoff(payoffs, nsteps + 1, price, strike, up, down, delt, sigma, opttype);
+    // smooth_payoff(payoffs, nsteps + 1, price, strike, up, down, delt, sigma, opttype);
 
 #ifdef DEBUG
     cout << "p " << prob  << " up " << up << " down " << down << " discount " << c << endl;
