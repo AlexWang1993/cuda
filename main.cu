@@ -18,6 +18,7 @@ static void usage(){
     fprintf(stderr, "\t\t digits: Required digits of accuracy. (If this is 0, then steps will be used)\n");
     fprintf(stderr, "\t\t steps: Number of timesteps. (Only used if digits are 0) \n");
     fprintf(stderr, "\t\t latticeType: 0 = Binomial lattice, 1 = No arbitrage lattice, 2 = Drifting Lattice\n");
+    fprintf(stderr, "\t\t smooth: 0 = Do not smooth payoff, 1 = Smooth payoff\n");
 }
 
 static void 
@@ -39,7 +40,8 @@ computeOptionValue(
     int opttype, 
     int type,
     int nsteps,
-    int latticeType){
+    int latticeType,
+    int smooth){
     //computational constants
     double delt = time / nsteps,
            coef = exp(rate * delt),
@@ -87,8 +89,11 @@ computeOptionValue(
 
         get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w1, price, up, down, opttype, strike, len, step_limit);
         checkCudaError("Failed to compute payoffs.");
-        smooth_payoff<<<1,1>>>(w1, len, price, strike, up, down, delt, sigma, opttype);
-        checkCudaError("Failed to smooth payoffs.");
+
+        if (smooth) {
+            smooth_payoff<<<1,1>>>(w1, len, price, strike, up, down, delt, sigma, opttype);
+            checkCudaError("Failed to smooth payoffs.");
+        }
 
         bool alter = true;
         for (int i = nsteps; i > 0; i--, alter = !alter) {
@@ -126,35 +131,39 @@ computeOptionValue(
         // }
         checkCudaError("Failed to copy payoffs.");
 
-#ifdef DEBUG2
-	//printf("debug2");
-        local = (double *)malloc(size);
-        cudaMemcpy(local, w, size, cudaMemcpyDeviceToHost);
-        fprintf(stderr, "Array after it: %d\n", 0);
+        if (smooth) {
 
-        for (int j = 0; j < len; j++){
-            fprintf(stderr, "%.20f\n", local[j]);
+        #ifdef DEBUG2
+        	//printf("debug2");
+                local = (double *)malloc(size);
+                cudaMemcpy(local, w, size, cudaMemcpyDeviceToHost);
+                fprintf(stderr, "Array after it: %d\n", 0);
+
+                for (int j = 0; j < len; j++){
+                    fprintf(stderr, "%.20f\n", local[j]);
+                }
+
+                free(local);
+                fprintf(stderr, "DOne Printing pre smoothed");
+        #endif
+                smooth_payoff<<<1,1>>>(w, len, price, strike, up, down, delt, sigma, opttype);
+                cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
+                checkCudaError("Failed to smooth payoffs.");
+
+        #ifdef DEBUG2
+                local = (double *)malloc(size);
+                cudaMemcpy(local, w +len, size, cudaMemcpyDeviceToHost);
+                fprintf(stderr, "Array after it: %d\n", 0);
+
+                for (int j = 0; j < len; j++){
+                    fprintf(stderr, "%f\n", local[j]);
+                }
+
+                free(local);
+                fprintf(stderr, "Done Printing post smoothed");
+        #endif
+
         }
-
-        free(local);
-        fprintf(stderr, "DOne Printing pre smoothed");
-#endif
-        smooth_payoff<<<1,1>>>(w, len, price, strike, up, down, delt, sigma, opttype);
-        cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
-        checkCudaError("Failed to smooth payoffs.");
-
-#ifdef DEBUG2
-        local = (double *)malloc(size);
-        cudaMemcpy(local, w +len, size, cudaMemcpyDeviceToHost);
-        fprintf(stderr, "Array after it: %d\n", 0);
-
-        for (int j = 0; j < len; j++){
-            fprintf(stderr, "%f\n", local[j]);
-        }
-
-        free(local);
-        fprintf(stderr, "Done Printing post smoothed");
-#endif
 
         for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
             int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 2);
@@ -200,6 +209,7 @@ int main(int argc, char* argv[])
         digits = atoi(argv[8]),
         nsteps = atoi(argv[9]),
         latticeType = atoi(argv[10]);
+        smooth = atoi(argv[11]);
 #ifdef FIND_TIME 
     clock_t start = clock();
 #endif
@@ -207,7 +217,7 @@ int main(int argc, char* argv[])
     cudaDeviceSynchronize();
     cudaThreadSynchronize();
     double prev_ans = computeOptionValue(price, strike, time, rate, sigma,
-                                    opttype, type, nsteps, latticeType);
+                                    opttype, type, nsteps, latticeType, smooth);
     if (digits == 0 && nsteps > 0){
         // no op, already computed our answer
     } else if (digits > 0){

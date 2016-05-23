@@ -91,6 +91,8 @@ int main(int argc, char* argv[]){
     int opttype = atoi(argv[6]), type = atoi(argv[7]), 
         nsteps = atoi(argv[8]);
 
+    int smooth = atoi(argv[9]);
+
     // if we want to price american
     (void) type;
 
@@ -107,9 +109,9 @@ int main(int argc, char* argv[]){
 
     double * payoffs = getPayoff(up, down, price, strike, nsteps + 1, opttype);
 
-#ifdef SMOOTH_PAYOFF
-    smooth_payoff(payoffs, nsteps + 1, price, strike, up, down, delt, sigma, opttype);
-#endif
+    if (smooth) {
+        smooth_payoff(payoffs, nsteps + 1, price, strike, up, down, delt, sigma, opttype);
+    }
 
 #ifdef DEBUG
     cout << "p " << prob  << " up " << up << " down " << down << " discount " << c << endl;
