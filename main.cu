@@ -87,7 +87,7 @@ computeOptionValue(
 
         get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w1, price, up, down, opttype, strike, len, step_limit);
         checkCudaError("Failed to compute payoffs.");
-        smooth_payoff<<<1,1>>>(w1, len);
+        smooth_payoff<<<1,1>>>(w1, len, price, strike, up, down, delt, sigma, opttype);
         checkCudaError("Failed to smooth payoffs.");
 
         bool alter = true;
@@ -139,7 +139,7 @@ computeOptionValue(
         free(local);
         fprintf(stderr, "DOne Printing pre smoothed");
 #endif
-        smooth_payoff<<<1,1>>>(w, len);
+        smooth_payoff<<<1,1>>>(w, len, price, strike, up, down, delt, sigma, opttype);
         cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
         checkCudaError("Failed to smooth payoffs.");
 

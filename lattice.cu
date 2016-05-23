@@ -58,14 +58,33 @@ get_payoff(double* w,
 }
 
 __global__ void
-smooth_payoff(double * w, const int n){
-    if (n < 5)
-        return;
-    int index = n / 2 - 2;
-    while (w[++index] != 0);
-    w[index-1] = (w[index-2] + w[index])/2;
-    w[index] = (w[index-1] + w[index+1])/2;
-    w[index+1] = (w[index] + w[index+2])/2;
+void smooth_payoff(double * w, const int n, double price, double strike, double up, double down, double delt, double sigma, int type){
+    if (type == CALL) {
+        for (int i = 0; i <= n; i++) {
+            double cur_price = price * pow(down, n - i - 1) * pow(up, i); 
+            if (exp(-sigma * sqrt(delt)) * cur_price > strike) {
+                w[i] = cur_price * (exp(sigma * sqrt(delt)) - exp(-sigma * sqrt(delt))) / (2.0 * sigma * sqrt(delt)) - strike;
+            } else if ((down * cur_price < strike) && (strike < up * cur_price)) {
+                w[i] = 1.0 /(2.0 * sigma * sqrt(delt)) * (cur_price * (exp(sigma * sqrt(delt)) - strike / cur_price) 
+                    - strike * (sigma * sqrt(delt) - log(strike / cur_price)));
+            } else {
+                w[i] = 0.0;
+            }
+        }
+    } else if (type == PUT) {
+        for (int i = 0; i <= n; i++) {
+            double cur_price = price * pow(down, n - i - 1) * pow(up, i); 
+            if (exp(sigma * sqrt(delt)) * cur_price < strike) {
+                w[i] = strike - cur_price * (exp(sigma * sqrt(delt)) - exp(-sigma * sqrt(delt))) / (2.0 * sigma * sqrt(delt));
+            } else if ((down * cur_price < strike) && (strike < up * cur_price)) {
+                w[i] = 1.0 /(2.0 * sigma * sqrt(delt)) * (strike * (log(strike / cur_price) + sigma * sqrt(delt)) 
+                    - cur_price * (strike / cur_price - exp(-sigma * sqrt(delt))));
+            } else {
+                w[i] = 0.0;
+            }
+        }
+    }
+    
 }
 
 __global__ void 
