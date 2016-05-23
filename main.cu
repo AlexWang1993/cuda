@@ -126,7 +126,7 @@ computeOptionValue(
         } else if (mode == LESS_MEMORY) {
             space_needed = 4 * size;
         } else if (mode == ONE_TRI_PER_THREAD) {
-            space_needed = (TRIANGLE_SIZE_PER_THREAD + 1) * size;
+            space_needed = (TRIANGLE_SIZE_PER_THREAD + 100) * size;
         }
 
         fprintf(stderr, "space needed: %d\n", space_needed);
