@@ -195,10 +195,10 @@ computeOptionValue(
         } else if (mode == ONE_TRI_PER_THREAD) {
 
             for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= (TRIANGLE_SIZE_PER_THREAD + 1)) {
-                int block_num = min(BLOCK_LIMIT, i / (32 * TRIANGLE_SIZE_PER_THREAD) + 1);
-                backward_recursion_lower_triangle_multiple<<<block_num, 32>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                int block_num = min(BLOCK_LIMIT, i / (THREAD_LIMIT * TRIANGLE_SIZE_PER_THREAD) + 1);
+                backward_recursion_lower_triangle_multiple<<<block_num, THREAD_LIMIT>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
                 checkCudaError("Failed to compute upper triangles.");
-                backward_recursion_upper_triangle_multiple<<<block_num, 32>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                backward_recursion_upper_triangle_multiple<<<block_num, THREAD_LIMIT>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
                 checkCudaError("Failed to compute lower triangles.");
             }
 
