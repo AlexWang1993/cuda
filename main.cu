@@ -46,7 +46,8 @@ computeOptionValue(
     int type,
     int nsteps,
     int latticeType,
-    int smooth){
+    int smooth,
+    int mode){
     //computational constants
     double delt = time / nsteps,
            coef = exp(rate * delt),
@@ -193,9 +194,9 @@ computeOptionValue(
 
             for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= (TRIANGLE_SIZE_PER_THREAD + 1)) {
                 int block_num = min(BLOCK_LIMIT, i / (THREAD_LIMIT * TRIANGLE_SIZE_PER_THREAD) + 1);
-                backward_recursion_lower_triangle_multiple<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                backward_recursion_lower_triangle_multiple<<<block_num, THREAD_LIMIT>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
                 checkCudaError("Failed to compute upper triangles.");
-                backward_recursion_upper_triangle_multiple<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                backward_recursion_upper_triangle_multiple<<<block_num, THREAD_LIMIT>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
                 checkCudaError("Failed to compute lower triangles.");
             }
 
@@ -246,7 +247,7 @@ int main(int argc, char* argv[])
         while (abs(ans - prev_ans) > pow(10, -digits)){
             prev_ans = ans;
             ans = computeOptionValue(price, strike, time, rate, sigma,
-                                        opttype, type, steps, latticeType, smooth);
+                                        opttype, type, steps, latticeType, smooth, mode);
             steps *= 2;
         }
     } else {
