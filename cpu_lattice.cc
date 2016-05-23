@@ -24,14 +24,27 @@ double * getPayoff(double up, double down, double price, double strike, int n, i
     return payoffs;
 }
 
-void smooth_payoff(double * w, const int n){
-    if (n < 5)
-        return;
-    int index = n / 2 - 2;
-    while (w[++index] != 0);
-    w[index-1] = (w[index-2] + w[index])/2;
-    w[index] = (w[index-1] + w[index+1])/2;
-    w[index+1] = (w[index] + w[index+2])/2;
+void smooth_payoff(double * w, const int n, double strike, double down, double up, double delt, double sigma){
+    if (type == CALL) {
+        for (int i = 0; i <= n; i++) {
+            if (exp(-sigma * sqrt(delt)) * w[i] > strike) {
+                w[i] = w[i] * (exp(sigma * sqrt(delt)) - exp(-sigma * sqrt(delt))) / (2.0 * sigma * sqrt(delt)) - strike;
+            } else if ((down * w[i] < strike) && (strike < up * w[i])) {
+                w[i] = 1.0 /(2.0 * sigma * sqrt(delt)) * (w[i] * (exp(sigma * sqrt(delt)) - strike / w[i]) 
+                    - strike * (sigma * sqrt(delt) - log(strike / w[i])));
+            }
+        }
+    } else (type == PUT) {
+        for (int i = 0; i <= n; i++) {
+            if (exp(sigma * sqrt(delt)) * w[i] < strike) {
+                w[i] = strike - w[i] * (exp(sigma * sqrt(delt)) - exp(-sigma * sqrt(delt))) / (2.0 * sigma * sqrt(delt));
+            } else if ((down * w[i] < strike) && (strike < up * w[i])) {
+                w[i] = 1.0 /(2.0 * sigma * sqrt(delt)) * (strike * (log(strike / w[i]) + sigma * sqrt(delt)) 
+                    - w[i] * (strike / w[i] - exp(-sigma * sqrt(delt))));
+            }
+        }
+    }
+    
 }
 
 double computeBackwards(double * payoffs, int n, double discount, double p, double strike, double price, double up, int type){
