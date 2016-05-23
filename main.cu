@@ -119,14 +119,14 @@ computeOptionValue(
         cudaFree(w1);
         cudaFree(w2);
     } else {
-        long space_needed = 0;
+        int space_needed = 0;
 
         if (mode == OLD) {
             space_needed = (THREAD_LIMIT + 1) * size;
         } else if (mode == LESS_MEMORY) {
             space_needed = 4 * size;
         } else if (mode == ONE_TRI_PER_THREAD) {
-            space_needed = (TRIANGLE_SIZE_PER_THREAD + 100) * size;
+            space_needed = (TRIANGLE_SIZE_PER_THREAD + 1) * size;
         }
 
         fprintf(stderr, "space needed: %d\n", space_needed);
@@ -195,10 +195,10 @@ computeOptionValue(
         } else if (mode == ONE_TRI_PER_THREAD) {
 
             for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= (TRIANGLE_SIZE_PER_THREAD + 1)) {
-                int block_num = min(BLOCK_LIMIT, i / (THREAD_LIMIT * TRIANGLE_SIZE_PER_THREAD) + 1);
-                backward_recursion_lower_triangle_multiple<<<block_num, THREAD_LIMIT>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                int block_num = min(BLOCK_LIMIT, i / (32 * TRIANGLE_SIZE_PER_THREAD) + 1);
+                backward_recursion_lower_triangle_multiple<<<block_num, 32>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
                 checkCudaError("Failed to compute upper triangles.");
-                backward_recursion_upper_triangle_multiple<<<block_num, THREAD_LIMIT>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                backward_recursion_upper_triangle_multiple<<<block_num, 32>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
                 checkCudaError("Failed to compute lower triangles.");
             }
 
