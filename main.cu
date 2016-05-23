@@ -5,6 +5,10 @@
 double * local;
 double * l;
 
+#define OLD 0
+#define LESS_MEMORY 1 
+#define ONE_TRI_PER_THREAD 2
+
 static void usage(){
     fprintf(stderr, "usage: ./app price strike timeToExp rate volatility optionType type digits steps latticeMethod\n");
     fprintf(stderr, "\nOption Args\n\t\t price: current price for the stock\n");
@@ -19,6 +23,7 @@ static void usage(){
     fprintf(stderr, "\t\t steps: Number of timesteps. (Only used if digits are 0) \n");
     fprintf(stderr, "\t\t latticeType: 0 = Binomial lattice, 1 = No arbitrage lattice, 2 = Drifting Lattice\n");
     fprintf(stderr, "\t\t smooth: 0 = Do not smooth payoff, 1 = Smooth payoff\n");
+    fprintf(stderr, "\t\t mode: 0 = Old impl, 1 = Linear space impl, 2 = One triangle per thread impl\n");
 }
 
 static void 
@@ -72,7 +77,6 @@ computeOptionValue(
     size_t dsize = sizeof(double), 
         size = len * dsize;
 
-  //  printf("%d", size);
     double* answer = (double *)malloc(dsize);
 
 
@@ -114,22 +118,22 @@ computeOptionValue(
         cudaFree(w1);
         cudaFree(w2);
     } else {
-	//printf("pre-debug2");
-        fprintf(stderr, "space needed: %d\n", (THREAD_LIMIT + 1) * size);
-        cudaMalloc((void **) &w, (THREAD_LIMIT + 1)  * size);
+        long space_needed = 0;
+
+        if (mode == OLD) {
+            space_needed = (THREAD_LIMIT + 1) * size;
+        } else if (mode == LESS_MEMORY) {
+            space_needed = 4 * size;
+        } else if (mode == ONE_TRI_PER_THREAD) {
+            space_needed = (TRIANGLE_SIZE_PER_THREAD + 1) * size;
+        }
+
+        fprintf(stderr, "space needed: %d\n", space_needed);
+        cudaMalloc((void **) &w, space_needed);
         checkCudaError("cudaMalloc failed for w.");
 
-	//printf("still-alive");
         get_payoff<<<BLOCK_LIMIT, THREAD_LIMIT>>>(w, price, up, down, opttype, strike, len, step_limit);
         checkCudaError("Failed to compute payoffs.");
-        // if (len % 2 == 0) {
-            // cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
-            // local = (double *)malloc(size);
-            // cudaMemcpy(local, w , size, cudaMemcpyDeviceToHost);
-            // cudaMemcpy(w + len, local, size, cudaMemcpyHostToDevice);
-
-        // }
-        checkCudaError("Failed to copy payoffs.");
 
         if (smooth) {
 
@@ -147,7 +151,6 @@ computeOptionValue(
                 fprintf(stderr, "DOne Printing pre smoothed");
         #endif
                 smooth_payoff<<<1,1>>>(w, len, price, strike, up, down, delt, sigma, opttype);
-                cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
                 checkCudaError("Failed to smooth payoffs.");
 
         #ifdef DEBUG2
@@ -165,27 +168,42 @@ computeOptionValue(
 
         }
 
-        for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
-            int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 2);
-            backward_recursion_lower_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
-            checkCudaError("Failed to compute upper triangles.");
-            backward_recursion_upper_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
-            checkCudaError("Failed to compute lower triangles.");
+        if (mode == OLD) {
+
+            for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
+                int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 2);
+                backward_recursion_lower_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+                checkCudaError("Failed to compute upper triangles.");
+                backward_recursion_upper_triangle<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+                checkCudaError("Failed to compute lower triangles.");
+            }
+
+        } else if (mode == LESS_MEMORY) {
+
+            cudaMemcpy(w + len, w, size, cudaMemcpyDeviceToDevice);
+            for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= THREAD_LIMIT) {
+                int block_num = min(BLOCK_LIMIT, (i / THREAD_LIMIT) + 2);
+                backward_recursion_lower_triangle_less_memory<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+                checkCudaError("Failed to compute upper triangles.");
+                backward_recursion_upper_triangle_less_memory<<<block_num, THREAD_LIMIT>>>(w, i, step_limit, len, c, prob, strike, up, down, price, type);
+                checkCudaError("Failed to compute lower triangles.");
+            }
+
+        } else if (mode == ONE_TRI_PER_THREAD) {
+
+            for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= (TRIANGLE_SIZE_PER_THREAD + 1)) {
+                int block_num = min(BLOCK_LIMIT, i / (THREAD_LIMIT * TRIANGLE_SIZE_PER_THREAD) + 1);
+                backward_recursion_lower_triangle_multiple<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                checkCudaError("Failed to compute upper triangles.");
+                backward_recursion_upper_triangle_multiple<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
+                checkCudaError("Failed to compute lower triangles.");
+            }
+
         }
-        // int last_ans_index;
-        // for (int i = min(nsteps, TRIANGLE_CEILING); i > 0; i -= (TRIANGLE_SIZE_PER_THREAD + 1)) {
-        //     last_ans_index = len * (min(TRIANGLE_SIZE_PER_THREAD, i)) ;
-        //     int thread_num = 32;
-        //     int block_num = min(BLOCK_LIMIT, i / (thread_num * TRIANGLE_SIZE_PER_THREAD) + 1);
-        //     backward_recursion_lower_triangle_multiple<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
-        //     checkCudaError("Failed to compute upper triangles.");
-        //     backward_recursion_upper_triangle_multiple<<<block_num, thread_num>>>(w, i, TRIANGLE_SIZE_PER_THREAD, len, c, prob, strike, up, down, price, type);
-        //     checkCudaError("Failed to compute lower triangles.");
-        // }
-        // cudaMemcpy(answer, w + last_ans_index, dsize, cudaMemcpyDeviceToHost);
+
         cudaMemcpy(answer, w , dsize, cudaMemcpyDeviceToHost);
         cudaFree(w);
-        // answer[0] = answer[0] * pow(c, nsteps);
+
     }
 
     return answer[0];
@@ -209,7 +227,8 @@ int main(int argc, char* argv[])
         digits = atoi(argv[8]),
         nsteps = atoi(argv[9]),
         latticeType = atoi(argv[10]),
-        smooth = atoi(argv[11]);
+        smooth = atoi(argv[11]),
+        mode = atoi(argv[12]);
 #ifdef FIND_TIME 
     clock_t start = clock();
 #endif
@@ -217,7 +236,7 @@ int main(int argc, char* argv[])
     cudaDeviceSynchronize();
     cudaThreadSynchronize();
     double prev_ans = computeOptionValue(price, strike, time, rate, sigma,
-                                    opttype, type, nsteps, latticeType, smooth);
+                                    opttype, type, nsteps, latticeType, smooth, mode);
     if (digits == 0 && nsteps > 0){
         // no op, already computed our answer
     } else if (digits > 0){

@@ -55,9 +55,9 @@ void smooth_payoff(double * w, const int n, double price, double strike, double 
 
 double computeBackwards(double * payoffs, int n, double discount, double p, double strike, double price, double up, int type){
     bool fl;
-    for (int j = 0 ; j <= n; j++) {
-        cout << setprecision(20) << payoffs[j] << " ";
-    }
+    // for (int j = 0 ; j <= n; j++) {
+    //     cout << setprecision(20) << payoffs[j] << " ";
+    // }
     for (int i = n ; i > 0; i--){
         fl = true;
         for (int j = 0; j < i; j++){
