@@ -20,7 +20,7 @@ test: all cpu_test
 	./app 10 10 0.1 0.02 0.2 0 0 5 25000 0
 
 cpu_test: cpu 
-	./cpu_app 10 10 0.1 0.02 0.2 0 0 25000
+	./cpu_app 10 12.567 0.1 0.02 0.2 0 0 25000
 
 timeExec: cpu_lattice.cc lattice.cu main.cu lattice.h
 	nvcc $(CXXFLAGS) -D FIND_TIME cpu_lattice.cc -o cpu_app_debug
